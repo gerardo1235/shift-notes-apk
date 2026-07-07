@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace           'com.shiftnotes.app'
+    compileSdkVersion   rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        applicationId    'com.shiftnotes.app'
+        minSdkVersion    rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode      2
+        versionName      '2.0.0'
+        manifestPlaceholders = [:]
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            debuggable    true
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (System.getenv('KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile     file(System.getenv('KEYSTORE_PATH') ?: 'release.keystore')
+            storePassword System.getenv('KEYSTORE_PASS') ?: ''
+            keyAlias      System.getenv('KEY_ALIAS')     ?: 'shiftnotes'
+            keyPassword   System.getenv('KEY_PASS')      ?: ''
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+    packagingOptions { jniLibs { useLegacyPackaging = true } }
+}
+
+repositories { google(); mavenCentral() }
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation 'com.getcapacitor:capacitor-core:6.2.0'
+    implementation 'com.getcapacitor:capacitor-android:6.2.0'
+}
